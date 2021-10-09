@@ -1,42 +1,38 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const accidentValidation = require('../../validations/accident.validation');
-const accidentController = require('../../controllers/accident.controller');
+const detailsAccidentValidation = require('../../validations/detailsAccident.validation');
+const detailsAccidentController = require('../../controllers/detailsAccident.controller');
 
 const router = express.Router();
 
 router
   .route('/')
-  .post(auth('Users'), validate(accidentValidation.createAccident), accidentController.createAccident)
-  .get(auth('Users'), validate(accidentValidation.getAccidents), accidentController.getAccidents);
+  .post(auth('Users'), validate(detailsAccidentValidation.createDetailsAccident), detailsAccidentController.createDetailsAccident)
+  .get(auth('Users'), validate(detailsAccidentValidation.getDetailsAccidents), detailsAccidentController.getDetailsAccidents);
 
 router
-  .route('/Urgent')
-  .post(auth('Users'), validate(accidentValidation.createAccidentUrgent), accidentController.createAccident);
-
-router
-  .route('/:accidentId')
-  .get(auth('Users'), validate(accidentValidation.getAccident), accidentController.getAccident)
-  .patch(auth('Users'), validate(accidentValidation.updateAccident), accidentController.updateAccident)
-  .delete(auth('Users'), validate(accidentValidation.deleteAccident),accidentController.deleteAccident);
+  .route('/:detailsAccidentId')
+  .get(auth('Users'), validate(detailsAccidentValidation.getDetailsAccident), detailsAccidentController.getDetailsAccident)
+  .patch(auth('Users'), validate(detailsAccidentValidation.updateDetailsAccident), detailsAccidentController.updateDetailsAccident)
+  .delete(auth('Users'), validate(detailsAccidentValidation.deleteDetailsAccident),detailsAccidentController.deleteDetailsAccident);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *  name: Accidents
- *  description: Accident retrieval
+ *  name: DetailsAccident
+ *  description: Details Accident retrieval
  */
 
 /**
  * @swagger
- * /accidents:
+ * /detailsAccidents:
  *   post:
- *     summary: Create a accident
- *     description: user can create other accidents.
- *     tags: [Accidents]
+ *     summary: Create a details accident
+ *     description: user can create other details accidents.
+ *     tags: [DetailsAccident]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -46,41 +42,36 @@ module.exports = router;
  *           schema:
  *             type: object
  *             required:
- *               - nameAccident
- *               - status
+ *               - accident
+ *               - user
  *               - content
+ *               - timeOut
  *               - locationName
  *               - latitude
  *               - longitude
- *               - people
- *               - user
  *             properties:
- *               nameAccident:
+ *               accident:
  *                 type: string
- *               status:
+ *               user:
  *                  type: string
- *                  enum: [danger,normal]
  *               content:
  *                 type: string
+ *               timeOut:
+ *                 type: Date
  *               locationName:
- *                 type: latitude
+ *                 type: string
  *               latitude:
  *                 type: string
  *               longitude:
  *                 type: string
- *               user:
- *                 type: string
- *               people:
- *                 type: Number
  *             example:
- *               nameAccident: fake name
- *               status: danger
- *               content: card
- *               locationName: nga
- *               latitude: "70.235122"
- *               longitude: "75.235122"
+ *               accident: 615704b89e78551a588d220f
  *               user: 615703b8c5678d1ea8f597af
- *               people: 2
+ *               content: card
+ *               timeOut: 09-06-2021
+ *               locationName: tay ninh
+ *               latitude: "75.253698"
+ *               longitude: "75.253698"
  *     responses:
  *       "201":
  *         description: Created
@@ -90,7 +81,7 @@ module.exports = router;
  *               type: object
  *               properties:
  *                 accident:
- *                   $ref: '#/components/schemas/Accident'
+ *                   $ref: '#/components/schemas/DetailsAccident'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -99,28 +90,48 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *
  *   get:
- *     summary: Get all accidents
- *     description: user can retrieve all accident.
- *     tags: [Accidents]
+ *     summary: Get all details accidents
+ *     description: user can retrieve all details accident.
+ *     tags: [DetailsAccident]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: nameAccident
+ *         name: user
  *         schema:
  *           type: string
- *         description: Accident name
+ *         description: user
  *       - in: query
- *         name: status
+ *         name: accident
  *         schema:
  *           type: string
- *           enum: [danger,normal]
- *         description: Accident status
+ *         description: accident
+ *       - in: query
+ *         name: statusLog
+ *         schema:
+ *           type: string
+ *           enum: [Start, Supporting , End]
+ *         description: status Log
+ *       - in: query
+ *         name: content
+ *         schema:
+ *           type: string
+ *         description: content
+ *       - in: query
+ *         name: timeOut
+ *         schema:
+ *           type: Date
+ *         description: Date out
  *       - in: query
  *         name: locationName
  *         schema:
  *           type: string
- *         description: Location name
+ *         description: address
+ *       - in: query
+ *         name: locationName
+ *         schema:
+ *           type: string
+ *         description: location Name
  *       - in: query
  *         name: latitude
  *         schema:
@@ -130,17 +141,7 @@ module.exports = router;
  *         name: longitude
  *         schema:
  *           type: string
- *         description: longitude
- *       - in: query
- *         name: user
- *         schema:
- *           type: string
- *         description: User
- *       - in: query
- *         name: people
- *         schema:
- *           type: Number
- *         description: people number
+ *         description: latitude
  *       - in: query
  *         name: sortBy
  *         schema:
@@ -171,7 +172,7 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Accident'
+ *                     $ref: '#/components/schemas/DetailsAccident'
  *                 page:
  *                   type: integer
  *                   example: 1
@@ -188,68 +189,17 @@ module.exports = router;
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
- */
-
-/**
- * @swagger
- * /accidents/Urgent:
- *   post:
- *     summary: Create a urgent accident
- *     description: user can create other urgent accidents.
- *     tags: [Accidents]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - locationName
- *               - latitude
- *               - longitude
- *               - user
- *             properties:
- *               locationName:
- *                 type: latitude
- *               latitude:
- *                 type: string
- *               longitude:
- *                 type: string
- *               user:
- *                 type: string
- *             example:
- *               locationName: nga
- *               latitude: "70.235122"
- *               longitude: "75.235122"
- *               user: 615703b8c5678d1ea8f597af
- *     responses:
- *       "201":
- *         description: Created
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 accident:
- *                   $ref: '#/components/schemas/Accident'
- *       "400":
- *         $ref: '#/components/responses/DuplicateEmail'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
  *
  */
 
+
 /**
  * @swagger
- * /accidents/{id}:
+ * /detailsAccidents/{id}:
  *   get:
- *     summary: Get a accident
- *     description: Logged in users can fetch only their own accident information
- *     tags: [Accidents]
+ *     summary: Get a details accident
+ *     description: Logged in users can fetch only their own details accident information
+ *     tags: [DetailsAccident]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -258,14 +208,14 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: accident id
+ *         description: details accident id
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/Accident'
+ *                $ref: '#/components/schemas/DetailsAccident'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -274,9 +224,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: edit a accident
- *     description:  Logged in users can update their own information..
- *     tags: [Accidents]
+ *     summary: edit a details accident
+ *     description:  Logged in users can update their own information.
+ *     tags: [DetailsAccident]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -285,7 +235,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: Accident id
+ *         description: details Accident id
  *     requestBody:
  *       required: true
  *       content:
@@ -293,30 +243,24 @@ module.exports = router;
  *           schema:
  *             type: object
  *             properties:
- *               nameAccident:
+ *               statusLog:
  *                 type: string
- *               status:
- *                 type: string
- *                 enum: [danger,normal]
+ *                 enum: [Start, Supporting , End]
  *               content:
  *                 type: string
- *               locationName:
+ *               timeOut:
  *                 type: string
- *               people:
- *                 type: Number
  *             example:
- *               nameAccident: fake name
- *               status: danger
+ *               statusLog: Supporting
  *               content: be banh sau
- *               locationName: tay ninh
- *               people: 2
+ *               timeOut: 09-09-2021
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/Accident'
+ *                $ref: '#/components/schemas/DetailsAccident'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -327,9 +271,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a accident
+ *     summary: Delete a details accident
  *     description: Logged in users can delete only themselves.
- *     tags: [Accidents]
+ *     tags: [DetailsAccident]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -338,7 +282,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: Accident id
+ *         description: details accident id
  *     responses:
  *       "200":
  *         description: No content
@@ -349,5 +293,4 @@ module.exports = router;
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  */
-
 

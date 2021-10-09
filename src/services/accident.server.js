@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
 const { Accident } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { loginUserWithEmailAndPassword } = require('./auth.service');
 
 /**
  * Create a accident
@@ -34,11 +33,10 @@ const getAccidentById = async (id) =>{
   return Accident.findById(id);
 };
 
-
 /**
  * Get accident by status
  * @param {string}  status
- * @returns {Promise<accident>}
+ * @returns {Promise<Accident>}
  */
 const getAccidentByStatus = async (status) =>{
   return Accident.findOne({status});
@@ -62,7 +60,7 @@ const deleteAccidentById = async (accidentId) => {
  * update accident bu id
  * @param {ObjectId} accidentId
  * @param {Object} updateBody
- * @returns {Promise<User>}
+ * @returns {Promise<Accident>}
  */
 const updateAccidentById = async (accidentId, updateBody) => {
   const accident = await getAccidentById(accidentId);
@@ -82,4 +80,3 @@ module.exports = {
   updateAccidentById,
   queryAccident
 };
-

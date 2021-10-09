@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { toJSON, paginate } = require('./plugins');
 const Schema = mongoose.Schema
 
 const detailsAccidentSchema = new Schema({
@@ -15,7 +16,20 @@ const detailsAccidentSchema = new Schema({
 
   statusLog: {
     type: String,
-    enum:['Start','Supporting','End']
+    enum:['Start','Supporting','End'],
+    default: 'Start'
+  },
+
+  locationName: {
+    type: String
+  },
+
+  latitude: {
+    type: String,
+  },
+
+  longitude: {
+    type: String,
   },
 
   content:{
@@ -31,6 +45,13 @@ const detailsAccidentSchema = new Schema({
     default: Date.now
   }
 
-})
-const DetailsAccident = mongoose.model('detailsAccident',detailsAccidentSchema);
+});
+/**
+ * @typedef detailsAccident
+ */
+detailsAccidentSchema.plugin(toJSON);
+detailsAccidentSchema.plugin(paginate);
+
+
+const DetailsAccident = mongoose.model('DetailsAccident',detailsAccidentSchema);
 module.exports = DetailsAccident;

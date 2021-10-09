@@ -66,7 +66,7 @@ module.exports = router;
  *               sex:
  *                  type: string
  *                  enum: [Male,Female,Other]
- *               doba:
+ *               dob:
  *                  type: date
  *             example:
  *               name: fake name
