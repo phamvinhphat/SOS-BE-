@@ -1,38 +1,38 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const detailsAccidentValidation = require('../../validations/detailsAccident.validation');
-const detailsAccidentController = require('../../controllers/detailsAccident.controller');
+const handbookValidation = require('../../validations/handbook.validation');
+const handbookController = require('../../controllers/handbook.controller');
 
 const router = express.Router();
 
 router
   .route('/')
-  .post(auth('Users'), validate(detailsAccidentValidation.createDetailsAccident), detailsAccidentController.createDetailsAccident)
-  .get(auth('Users'), validate(detailsAccidentValidation.getDetailsAccidents), detailsAccidentController.getDetailsAccidents);
+  .post(auth('Users'), validate(handbookValidation.createHandbook), handbookController.createHandbook)
+  .get(auth('Users'), validate(handbookValidation.getHandbooks), handbookController.getHandbooks);
 
 router
-  .route('/:detailsAccidentId')
-  .get(auth('Users'), validate(detailsAccidentValidation.getDetailsAccident), detailsAccidentController.getDetailsAccident)
-  .patch(auth('Users'), validate(detailsAccidentValidation.updateDetailsAccident), detailsAccidentController.updateDetailsAccident)
-  .delete(auth('Users'), validate(detailsAccidentValidation.deleteDetailsAccident),detailsAccidentController.deleteDetailsAccident);
+  .route('/:handbookId')
+  .get(auth('Users'), validate(handbookValidation.getHandbook), handbookController.getHandbook)
+  .patch(auth('Users'), validate(handbookValidation.updateHandbook), handbookController.updateHandbook)
+  .delete(auth('Users'), validate(handbookValidation.deleteHandbook),handbookController.deleteHandbook);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *  name: DetailsAccident
- *  description: Details Accident retrieval
+ *  name: Handbooks
+ *  description: Handbook retrieval
  */
 
 /**
  * @swagger
- * /detailsAccidents:
+ * /handbooks:
  *   post:
- *     summary: Create a details accident
- *     description: user can create other details accidents.
- *     tags: [DetailsAccident]
+ *     summary: Create a handbook
+ *     description: user can create other handbook.
+ *     tags: [Handbooks]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -42,36 +42,29 @@ module.exports = router;
  *           schema:
  *             type: object
  *             required:
- *               - accident
- *               - user
+ *               - nameHandbook
+ *               - severity
+ *               - icon
  *               - content
- *               - timeOut
- *               - locationName
- *               - latitude
- *               - longitude
+ *               - utensil
  *             properties:
- *               accident:
+ *               nameHandbook:
  *                 type: string
- *               user:
+ *               severity:
  *                  type: string
+ *                  enum: [Serious,Medium,Simple]
+ *               icon:
+ *                 type: string
  *               content:
  *                 type: string
- *               timeOut:
- *                 type: Date
- *               locationName:
- *                 type: string
- *               latitude:
- *                 type: string
- *               longitude:
+ *               utensil:
  *                 type: string
  *             example:
- *               accident: 615704b89e78551a588d220f
- *               user: 615703b8c5678d1ea8f597af
- *               content: card
- *               timeOut: 09-06-2021
- *               locationName: tay ninh
- *               latitude: "75.253698"
- *               longitude: "75.253698"
+ *               nameHandbook: băng bó
+ *               severity: Simple
+ *               icon: card
+ *               content: băng lại
+ *               utensil: băng
  *     responses:
  *       "201":
  *         description: Created
@@ -81,7 +74,7 @@ module.exports = router;
  *               type: object
  *               properties:
  *                 accident:
- *                   $ref: '#/components/schemas/DetailsAccident'
+ *                   $ref: '#/components/schemas/Handbook'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -90,58 +83,38 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *
  *   get:
- *     summary: Get all details accidents
- *     description: user can retrieve all details accident.
- *     tags: [DetailsAccident]
+ *     summary: Get all handbook
+ *     description: user can retrieve all handbook.
+ *     tags: [Handbooks]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: user
+ *         name: nameHandbook
  *         schema:
  *           type: string
- *         description: user
+ *         description: Handbook name
  *       - in: query
- *         name: accident
+ *         name: severity
  *         schema:
  *           type: string
- *         description: accident
+ *           enum: [Serious, Medium, Simple]
+ *         description: handbook severity
  *       - in: query
- *         name: statusLog
+ *         name: icon
  *         schema:
  *           type: string
- *           enum: [Start, Supporting , End]
- *         description: status Log
+ *         description: icon
  *       - in: query
  *         name: content
  *         schema:
  *           type: string
  *         description: content
  *       - in: query
- *         name: timeOut
- *         schema:
- *           type: Date
- *         description: Date out
- *       - in: query
- *         name: locationName
+ *         name: utensil
  *         schema:
  *           type: string
- *         description: address
- *       - in: query
- *         name: locationName
- *         schema:
- *           type: string
- *         description: location Name
- *       - in: query
- *         name: latitude
- *         schema:
- *           type: string
- *         description: latitude
- *       - in: query
- *         name: longitude
- *         schema:
- *           type: string
- *         description: latitude
+ *         description: utensil
  *       - in: query
  *         name: sortBy
  *         schema:
@@ -172,7 +145,7 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/DetailsAccident'
+ *                     $ref: '#/components/schemas/Handbook'
  *                 page:
  *                   type: integer
  *                   example: 1
@@ -195,11 +168,11 @@ module.exports = router;
 
 /**
  * @swagger
- * /detailsAccidents/{id}:
+ * /handbooks/{id}:
  *   get:
- *     summary: Get a details accident
- *     description: Logged in users can fetch only their own details accident information
- *     tags: [DetailsAccident]
+ *     summary: Get a handbooks
+ *     description: Logged in users can fetch only their own handbooks information
+ *     tags: [Handbooks]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -208,14 +181,14 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: details accident id
+ *         description: handbook id
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/DetailsAccident'
+ *                $ref: '#/components/schemas/Handbook'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -224,9 +197,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: edit a details accident
+ *     summary: edit a Handbook
  *     description:  Logged in users can update their own information.
- *     tags: [DetailsAccident]
+ *     tags: [Handbooks]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -235,7 +208,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: details Accident id
+ *         description: Handbooks id
  *     requestBody:
  *       required: true
  *       content:
@@ -243,24 +216,30 @@ module.exports = router;
  *           schema:
  *             type: object
  *             properties:
- *               statusLog:
+ *               nameHandbook:
  *                 type: string
- *                 enum: [Start, Supporting , End]
+ *               severity:
+ *                  type: string
+ *                  enum: [Serious,Medium,Simple]
+ *               icon:
+ *                 type: string
  *               content:
  *                 type: string
- *               timeOut:
+ *               utensil:
  *                 type: string
  *             example:
- *               statusLog: Supporting
+ *               nameHandbook: fakename
+ *               severity: Serious
+ *               icon: image
  *               content: be banh sau
- *               timeOut: 09-09-2021
+ *               utensil: keo
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/DetailsAccident'
+ *                $ref: '#/components/schemas/Handbook'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -271,9 +250,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a details accident
+ *     summary: Delete a Handbook
  *     description: Logged in users can delete only themselves.
- *     tags: [DetailsAccident]
+ *     tags: [Handbooks]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -282,7 +261,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: details accident id
+ *         description: Handbook id
  *     responses:
  *       "200":
  *         description: No content
@@ -293,4 +272,6 @@ module.exports = router;
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  */
+
+
 

@@ -1,41 +1,43 @@
 const Joi = require('joi');
 const { objectId } = require("./custom.validation");
+const docker = require("../config/docker");
+//const auth = require("../middlewares/auth");
 
 const createAccident = {
   body: Joi.object().keys({
     nameAccident: Joi.string(),
-    status: Joi.string().valid('danger', 'normal'),
-    content: Joi.string(),
-    locationName: Joi.string(),
+    accidentType: Joi.string().custom(Object),
+    description: Joi.string(),
     latitude: Joi.string(),
     longitude: Joi.string(),
-    people: Joi.number(),
-    user: Joi.string().custom(Object),
+    created_by: Joi.string().custom(Object),
+    modified_by: Joi.string().custom(Object),
+    createTime:Joi.date(),
+    UpdateTime:Joi.date(),
   }),
 };
 
 const createAccidentUrgent = {
   body: Joi.object().keys({
-    nameAccident: Joi.string().default('Tai nạn sử dụng thông báo khẩn cấp'),
-    status: Joi.string().default('danger'),
-    content: Joi.string().default('Cần gấp người trợ giúp'),
-    locationName: Joi.string(),
+    nameAccident: Joi.string().default(docker.descriptionNameAU),
+    accidentType: Joi.string().custom(Object),
+    description: Joi.string().default(docker.descriptionContentAU),
     latitude: Joi.string(),
     longitude: Joi.string(),
-    people: Joi.string().default(0),
-    user: Joi.string().custom(Object),
+    created_by: Joi.string().custom(Object),
+    modified_by: Joi.string().custom(Object),
+    createTime:Joi.date(),
+    UpdateTime:Joi.date(),
   }),
 }
 
 const getAccidents = {
   query: Joi.object().keys({
     nameAccident: Joi.string(),
-    status: Joi.string().valid('danger', 'normal'),
-    locationName: Joi.string(),
-    latitude: Joi.string(),
-    longitude: Joi.string(),
-    user: Joi.string().custom(Object),
-    people: Joi.number(),
+    accidentType: Joi.string(),
+    created_by: Joi.string(),
+    modified_by: Joi.string(),
+    status: Joi.string().valid('Waiting','Success','Cancel'),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
@@ -54,11 +56,14 @@ const updateAccident = {
   }),
   body: Joi.object().keys({
       nameAccident: Joi.string(),
-      status: Joi.string().valid('danger', 'normal'),
-      content: Joi.string(),
-      locationName: Joi.string(),
-      people: Joi.number(),
-    })
+      accidentType: Joi.string().custom(Object),
+      description: Joi.string(),
+      latitude: Joi.string(),
+      longitude: Joi.string(),
+      UpdateTime:Joi.date(),
+      modified_by: Joi.string().custom(Object),
+      status: Joi.string().valid('Waiting','Success','Cancel'),
+  })
       .min(1),
 };
 
@@ -76,8 +81,3 @@ module.exports = {
   updateAccident,
   deleteAccident
 };
-
-
-
-
-

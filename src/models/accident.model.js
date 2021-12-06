@@ -1,29 +1,55 @@
 const mongoose = require('mongoose')
 const { toJSON, paginate } = require('./plugins');
 const Schema = mongoose.Schema
+const docker = require('../config/docker')
 
 const accidentSchema = new Schema({
 
-  user: {
+  created_by: {
     type: mongoose.SchemaTypes.ObjectId,
     ref:'User'
   },
+
   nameAccident: {
     type: String,
-    default: 'Tai nạn'
-  },
-  status: {
-    type: String,
-    enum: ['danger','normal']
+    default: docker.descriptionNameAccident
   },
 
-  content: {
-    type: String,
-    default: 'Cần được hỗ trợ'
+  modified_by: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref:'User'
   },
 
-  locationName: {
-    type: String
+  accidentType: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref:'AccidentType'
+  },
+
+  description: {
+    type: String,
+    default: docker.descriptionContentAccident
+  },
+
+  //FE
+  // số người giúp:  0.
+
+  // giao dien list
+  // (BE) staus: start
+  // (FE) Số người giúp:  2(getAll DA).
+
+  //nút : update thành công
+
+  // huỷ
+
+  // BE
+  // đang cần hỗ trợ  create.
+  // thành công       update(nút).
+  // huỷ.             update(nút).
+
+  status:{
+    type: String,
+    enum:['Waiting','Success','Cancel'],
+    default: 'Waiting'
   },
 
   latitude: {
@@ -34,15 +60,14 @@ const accidentSchema = new Schema({
     type: String,
   },
 
-  people: {
-    type: Number,
-    default: 1,
+  createTime:{
+    type: Date,
   },
 
-  timeStart: {
+  UpdateTime:{
     type: Date,
-    default: Date.now
-  }
+  },
+
 });
 /**
  * @typedef Accident

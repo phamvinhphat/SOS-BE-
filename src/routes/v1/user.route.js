@@ -3,7 +3,7 @@ const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const userValidation = require('../../validations/user.validation');
 const userController = require('../../controllers/user.controller');
-
+const { get } = require('mongoose');
 const router = express.Router();
 
 router
@@ -12,9 +12,16 @@ router
   .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers);
 
 router
+  .route('/me')
+  .get(auth('Users'), validate(userValidation.getUser), userController.getUser);
+
+router
+  .route('/update')
+  .patch(auth('Users'), validate(userValidation.updateUser), userController.updateUser)
+
+router
   .route('/:userId')
-  .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
-  .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
+  .get(auth('Users'),validate(userValidation.getUser),userController.getUserById)
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
 module.exports = router;
@@ -165,7 +172,92 @@ module.exports = router;
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
+ *
  */
+
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Send verification email
+ *     description: An email will be sent to verify email.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/User'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ */
+
+/**
+ * @swagger
+ * /users/update:
+ *   patch:
+ *     summary: Update a user
+ *     description: Logged in users can only update their own information. Only admins can update other users.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 minLength: 8
+ *                 description: At least one number and one letter
+ *               identityCard:
+ *                 type: string
+ *               numberPhone:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               sex:
+ *                 type: string
+ *                 enum: [Male, Female, Other]
+ *               dob:
+ *                 type: date
+ *             example:
+ *               name: fake name
+ *               password: passwords1
+ *               identityCard: "125647859632"
+ *               numberPhone: "0253468952"
+ *               address: "Tây ninh"
+ *               sex: Male
+ *               dob: 09-09-2021
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/User'
+ *       "400":
+ *         $ref: '#/components/responses/DuplicateEmail'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ */
+
 
 /**
  * @swagger
@@ -190,73 +282,6 @@ module.exports = router;
  *           application/json:
  *             schema:
  *                $ref: '#/components/schemas/User'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *       "404":
- *         $ref: '#/components/responses/NotFound'
- *
- *   patch:
- *     summary: Update a user
- *     description: Logged in users can only update their own information. Only admins can update other users.
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: User id
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *                 description: must be unique
- *               password:
- *                 type: string
- *                 format: password
- *                 minLength: 8
- *                 description: At least one number and one letter
- *               identityCard:
- *                 type: string
- *               numberPhone:
- *                 type: string
- *               address:
- *                 type: string
- *               sex:
- *                 type: string
- *                 enum: [Male, Female, Other]
- *               dob:
- *                 type: date
- *             example:
- *               name: fake name
- *               email: fake@example.com
- *               password: password1
- *               identityCard: "125647859632"
- *               numberPhone: "0253468952"
- *               address: "Tây ninh"
- *               sex: Male
- *               dob: 09-09-2021
- *     responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *                $ref: '#/components/schemas/User'
- *       "400":
- *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
