@@ -32,18 +32,17 @@ const getUser = {
 };
 
 const updateUser = {
-  params: Joi.object().keys({
-    userId: Joi.required().custom(objectId),
-  }),
+  // params: Joi.object().keys({
+  //   userId: Joi.required().custom(objectId),
+  // }),
   body: Joi.object()
     .keys({
-      email: Joi.string().email(),
-      password: Joi.string().custom(password),
       name: Joi.string(),
+      Avatar: Joi.string(),
       identityCard: Joi.string().required(),
       numberPhone: Joi.string().required(),
       address: Joi.string().required(),
-      sex: Joi.string().required().valid('Male','Female','Other'),
+   //   sex: Joi.string().required().valid('Male','Female','Other'),
       dob: Joi.date(),
     })
     .min(1),

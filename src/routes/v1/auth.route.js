@@ -3,7 +3,7 @@ const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const authController = require('../../controllers/auth.controller');
 const auth = require('../../middlewares/auth');
-
+const passport = require('passport');
 const router = express.Router();
 
 router.post('/register', validate(authValidation.register), authController.register);
@@ -11,12 +11,12 @@ router.post('/login', validate(authValidation.login), authController.login);
 router.post('/logout', validate(authValidation.logout), authController.logout);
 router.post('/refresh-tokens', validate(authValidation.refreshTokens), authController.refreshTokens);
 router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
-router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
+router.get('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
-router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
-
+router.get('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
+// router.get('/me', passport.authenticate('jwt', { session: false }), authController.getCurrentUser);
+router.patch('/change-password',auth() ,validate(authValidation.changePassword), authController.changePassUser);
 module.exports = router;
-
 /**
  * @swagger
  * tags:
@@ -126,8 +126,6 @@ module.exports = router;
  *             schema:
  *               type: object
  *               properties:
- *                 user:
- *                   $ref: '#/components/schemas/User'
  *                 tokens:
  *                   $ref: '#/components/schemas/AuthTokens'
  *       "401":
@@ -228,7 +226,7 @@ module.exports = router;
 /**
  * @swagger
  * /auth/reset-password:
- *   post:
+ *   get:
  *     summary: Reset password
  *     tags: [Auth]
  *     parameters:
@@ -286,8 +284,44 @@ module.exports = router;
 
 /**
  * @swagger
+ * /auth/change-password:
+ *   patch:
+ *     summary: change password
+ *     description: change password
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 minLength: 8
+ *                 description: At least one number and one letter
+ *             example:
+ *               password: passwords1
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/User'
+ *       "204":
+ *         description: No content
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+
+/**
+ * @swagger
  * /auth/verify-email:
- *   post:
+ *   get:
  *     summary: verify email
  *     tags: [Auth]
  *     parameters:
@@ -310,3 +344,4 @@ module.exports = router;
  *               code: 401
  *               message: verify email failed
  */
+

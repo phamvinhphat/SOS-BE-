@@ -8,6 +8,8 @@ const envVarsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(3000),
+    PORT_SOCKET:Joi.number().default(3500),
+    Link_To_App: Joi.string().description('link to app'),
     MONGODB_URL: Joi.string().required().description('Mongo DB url'),
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
@@ -50,6 +52,7 @@ module.exports = {
     resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
     verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
   },
+
   email: {
     smtp: {
       host: envVars.SMTP_HOST,
@@ -61,4 +64,13 @@ module.exports = {
     },
     from: envVars.EMAIL_FROM,
   },
+
+  link: {
+    linkApp: envVars.Link_To_App,
+  },
+
+  portSocket:{
+     portS: envVars.PORT_SOCKET,
+  }
+
 };
